@@ -1,7 +1,8 @@
 # 米游社配置
 mihoyo:
-  cookie: "your_cookie_here"
+  cookie: "your cookie here"
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0)"
+  nickname: "旅行者1号"
 
 # 服务器配置
 server:

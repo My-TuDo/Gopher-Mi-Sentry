@@ -14,6 +14,7 @@ type Config struct {
 type MihoyoConfig struct {
 	Cookie    string `mapstructure:"cookie"`
 	UserAgent string `mapstructuere:"user_agent"`
+	Nickname  string `mapstructure:"nickname"`
 }
 
 var GlobalConfig *Config
