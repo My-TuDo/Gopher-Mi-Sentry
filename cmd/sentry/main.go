@@ -19,14 +19,32 @@ func main() {
 	miClient := client.NewMiClient()
 
 	// 尝试查询原神角色
-	res, err := miClient.GetGameRoles("hk4e_cn")
-	if err != nil || res.Retcode != 0 {
-		log.Fatalf("获取游戏角色失败： %v, 消息： %s", err, res.Message)
+	relos, err := miClient.GetGameRoles("hk4e_cn")
+	if err != nil || relos.Retcode != 0 {
+		log.Fatalf("获取游戏角色失败： %v, 消息： %s", err, relos.Message)
 	}
 
-	fmt.Printf("发现账号 [%s] 下共有 %d 个角色：\n", config.GlobalConfig.Mihoyo.Nickname, len(res.Data.List))
-	for _, role := range res.Data.List {
+	fmt.Printf("发现账号 [%s] 下共有 %d 个角色：\n", config.GlobalConfig.Mihoyo.Nickname, len(relos.Data.List))
+	for _, role := range relos.Data.List {
 		fmt.Printf("- %s (UID: %s, 等级: %d, 服务器: %s)\n", role.Nickname, role.GameUid, role.Level, role.RegionName)
+	}
+
+	// 遍历角色并签到
+	for _, role := range relos.Data.List {
+		fmt.Printf("正在为角色 [%s] 执行签到...\n", role.Nickname)
+
+		res, err := miClient.DoSign(role)
+		if err != nil {
+			fmt.Printf("签到通信异常： %v\n", err)
+			continue
+		}
+
+		if res.Retcode == 0 {
+			fmt.Printf("签到成功！奖励已发往油箱。消息： %s\n", res.Message)
+		} else {
+			fmt.Printf("签到反馈： %s (错误码: %d)\n", res.Message, res.Retcode)
+		}
+
 	}
 
 	// // 3. 执行一次探测
