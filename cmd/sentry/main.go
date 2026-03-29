@@ -6,6 +6,7 @@ import (
 
 	"github.com/My-TuDo/gopher-mi-sentry/internal/client"
 	"github.com/My-TuDo/gopher-mi-sentry/internal/config"
+	"github.com/My-TuDo/gopher-mi-sentry/internal/network"
 )
 
 func main() {
@@ -14,6 +15,15 @@ func main() {
 		log.Fatalf("初始化失败： %v", err)
 	}
 	fmt.Println("配置加载成功！")
+
+	//  --- Day12 新增：网络预检 ---
+	fmt.Println("正在评估通往米哈游总部的网络质量...")
+	latency, err := network.CheckMihoyoStatus()
+	if err != nil {
+		// 这里选择报错并停止，因为网不通，签到肯定失败
+		log.Fatalf("网络哨兵报警： %v", err)
+	}
+	fmt.Printf("信号良好！当前网络延迟： %v \n", latency)
 
 	// 2. 初始化米游社客户端
 	miClient := client.NewMiClient()
