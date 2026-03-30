@@ -7,3 +7,7 @@ mihoyo:
 # 服务器配置
 server:
   port: 8080
+
+database:
+  # 格式： 用户名： 密码@tcp(主机:端口)/数据库名
+  dsn: "root:123456@tcp(127.0.0.1:3306)/go_70_days?charset=utf8mb4&parseTime=True&loc=Local"

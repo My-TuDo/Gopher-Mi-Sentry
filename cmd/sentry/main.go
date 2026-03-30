@@ -6,6 +6,7 @@ import (
 
 	"github.com/My-TuDo/gopher-mi-sentry/internal/client"
 	"github.com/My-TuDo/gopher-mi-sentry/internal/config"
+	"github.com/My-TuDo/gopher-mi-sentry/internal/database"
 	"github.com/My-TuDo/gopher-mi-sentry/internal/network"
 )
 
@@ -15,6 +16,12 @@ func main() {
 		log.Fatalf("初始化失败： %v", err)
 	}
 	fmt.Println("配置加载成功！")
+
+	// 初始化数据库
+	if err := database.InitDB(); err != nil {
+		log.Fatalf("数据库初始化失败： %v", err)
+	}
+	fmt.Println("数据库初始化成功！")
 
 	//  --- Day12 新增：网络预检 ---
 	fmt.Println("正在评估通往米哈游总部的网络质量...")

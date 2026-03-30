@@ -8,7 +8,12 @@ import (
 
 // 定义配置构造体（与 YAML 对应）
 type Config struct {
-	Mihoyo MihoyoConfig `mapstructure:"mihoyo"`
+	Mihoyo   MihoyoConfig   `mapstructure:"mihoyo"`
+	Database DatabaseConfig `mapstructure:"database"`
+}
+
+type DatabaseConfig struct {
+	DSN string `mapstructure:"dsn"`
 }
 
 type MihoyoConfig struct {
