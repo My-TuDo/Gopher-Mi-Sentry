@@ -64,6 +64,18 @@ func main() {
 
 	}
 
+	// 将抓取到的账号信息存入数据库（可选）
+	// 手动触发一次数据库写入
+	// 验证从 [配置加载] -> [结构体映射] -> [GORM 驱动] -> [MySQL存储] 的全链路是否通畅
+	database.DB.Create(&database.Account{
+		UID:      relos.Data.List[0].GameUid,
+		Nickname: relos.Data.List[0].Nickname,
+		Cookie:   config.GlobalConfig.Mihoyo.Cookie,
+		Status:   "active",
+	})
+
+	fmt.Println("账号信息(test)已成功持久化至数据库！")
+
 	// // 3. 执行一次探测
 	// fmt.Println(" 正在尝试连接米哈游服务器...")
 	// result, err := miClient.GetGameRoles()

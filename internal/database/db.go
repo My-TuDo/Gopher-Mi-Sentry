@@ -25,6 +25,14 @@ type Account struct {
 // InitDB 初始化数据库
 func InitDB() error {
 	dsn := config.GlobalConfig.Database.DSN // 我们要在 YAML 里加上这个
+
+	// 防止因配置文件路径错误或者格式错误导致程序出现“静默失败”
+	if dsn == "" {
+		return fmt.Errorf("数据库 DSN 不能为空，请检查配置文件")
+	}
+	// 调试：在非生产环境下打印信息，快速定位配置偏差
+	fmt.Printf("正在连接数据库，DSN: [%s]\n", dsn)
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return fmt.Errorf("连接数据库失败: %w", err)
