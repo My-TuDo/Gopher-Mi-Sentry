@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/My-TuDo/gopher-mi-sentry/internal/client"
 	"github.com/My-TuDo/gopher-mi-sentry/internal/config"
@@ -64,17 +65,39 @@ func main() {
 
 	}
 
-	// 将抓取到的账号信息存入数据库（可选）
-	// 手动触发一次数据库写入
-	// 验证从 [配置加载] -> [结构体映射] -> [GORM 驱动] -> [MySQL存储] 的全链路是否通畅
-	database.DB.Create(&database.Account{
-		UID:      relos.Data.List[0].GameUid,
-		Nickname: relos.Data.List[0].Nickname,
-		Cookie:   config.GlobalConfig.Mihoyo.Cookie,
-		Status:   "active",
-	})
+	// 3. 获得真实角色并同步
+	fmt.Println("正在同步账号信息至数据库...")
+	roles, err := miClient.GetGameRoles("hk4e_cn")
+	if err != nil {
+		log.Fatalf("获取游戏角色失败： %v", err)
+	}
 
-	fmt.Println("账号信息(test)已成功持久化至数据库！")
+	for _, role := range roles.Data.List {
+		acc := &database.Account{
+			UID:       role.GameUid,
+			Nickname:  role.Nickname,
+			Cookie:    config.GlobalConfig.Mihoyo.Cookie,
+			Status:    "Active",
+			UpdatedAt: time.Now().Format("2006-01-02 15:04:05"),
+		}
+		if err := database.SyncAccount(acc); err != nil {
+			log.Printf("同步UID： %s 失败： %v", role.GameUid, err)
+		} else {
+			fmt.Printf("角色 [%s] 的账号信息已成功同步至数据库！\n", role.Nickname)
+		}
+	}
+
+	// // 将抓取到的账号信息存入数据库（可选）
+	// // 手动触发一次数据库写入
+	// // 验证从 [配置加载] -> [结构体映射] -> [GORM 驱动] -> [MySQL存储] 的全链路是否通畅
+	// database.DB.Create(&database.Account{
+	// 	UID:      relos.Data.List[0].GameUid,
+	// 	Nickname: relos.Data.List[0].Nickname,
+	// 	Cookie:   config.GlobalConfig.Mihoyo.Cookie,
+	// 	Status:   "active",
+	// })
+
+	// fmt.Println("账号信息(test)已成功持久化至数据库！")
 
 	// // 3. 执行一次探测
 	// fmt.Println(" 正在尝试连接米哈游服务器...")

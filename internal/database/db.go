@@ -6,6 +6,7 @@ import (
 	"github.com/My-TuDo/gopher-mi-sentry/internal/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 var DB *gorm.DB
@@ -45,4 +46,15 @@ func InitDB() error {
 	}
 	DB = db
 	return nil
+}
+
+func SyncAccount(acc *Account) error {
+	// 核心 SRE 逻辑： Upsert
+	// 如果 UID 已存在，则更新 Nickname Cookie 和 UpdateAt
+	err := DB.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "uid"}}, // 以 UID 作为唯一键
+		DoUpdates: clause.AssignmentColumns([]string{"nickname", "cookie", "updated_at"}),
+	}).Create(acc).Error
+
+	return err
 }
